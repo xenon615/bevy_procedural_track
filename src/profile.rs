@@ -1,7 +1,4 @@
 use bevy::prelude::*;
-
-// ---
-
 pub trait ElementProfile {
     fn build(&self, current: &(Vec3, Vec3), next: &(Vec3, Vec3),  verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>);
     fn shoulders(current: &(Vec3, Vec3), next: &(Vec3, Vec3), half_width: f32) -> ((Vec3, Vec3), (Vec3, Vec3)) {
