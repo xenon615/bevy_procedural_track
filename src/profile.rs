@@ -27,6 +27,50 @@ impl ElementProfile for EpFlat {
 
 #[allow(dead_code)]
 pub struct EpBox { pub half_width: f32, pub half_height: f32 }
+// impl ElementProfile for EpBox {
+//     fn build(&self, current: &(Vec3, Vec3), next: &(Vec3, Vec3),  verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
+//         let (current, next) = Self::shoulders(current, next, self.half_width);
+//         let j =  verts.len() as u32;
+//         let norm = (current.1 - current.0).normalize().cross((current.0 - next.0).normalize()).normalize();
+//         let top = vec![current.0, current.1, next.0, next.1]
+//             .iter()
+//             .map(| e | (e + norm * self.half_height).to_array())
+//             .collect::<Vec<_>>();
+//         let bottom = vec![current.0, current.1, next.0, next.1]
+//             .iter()
+//             .map(| e | (e - norm * self.half_height).to_array())
+//             .collect::<Vec<_>>();
+//         let right = vec![current.1 - norm * self.half_height, next.1 - norm * self.half_height , current.1 + norm * self.half_height, next.1 + norm * self.half_height]
+//             .iter()
+//             .map(|e| e.to_array())
+//             .collect::<Vec<_>>();
+//         let left = vec![current.0 - norm * self.half_height, next.0 - norm * self.half_height , current.0 + norm * self.half_height, next.0 + norm * self.half_height]
+//             .iter()
+//             .map(|e| e.to_array())
+//             .collect::<Vec<_>>()
+//         ;
+
+//         verts.extend_from_slice(&top);
+//         verts.extend_from_slice(&bottom);
+//         verts.extend_from_slice(&right);
+//         verts.extend_from_slice(&left);
+
+//         idxs.extend_from_slice(&[
+//             j, j + 2, j + 1,
+//             j + 2, j + 3, j + 1,
+
+//             j + 5, j + 6, j + 4,
+//             j + 6, j + 5, j + 7,
+
+//             j + 8, j + 10, j + 9,
+//             j + 9, j + 10, j + 11,
+
+//             j + 14, j + 12, j + 13,
+//             j + 14, j + 13, j + 15,
+//         ]);
+//     }
+// }
+
 impl ElementProfile for EpBox {
     fn build(&self, current: &(Vec3, Vec3), next: &(Vec3, Vec3),  verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
         let (current, next) = Self::shoulders(current, next, self.half_width);
@@ -70,6 +114,7 @@ impl ElementProfile for EpBox {
         ]);
     }
 }
+
 
 #[allow(dead_code)]
 pub struct EpSquareChannel { pub half_width: f32, pub height: f32, pub depth: f32, pub border_width: f32}

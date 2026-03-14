@@ -4,57 +4,40 @@ use bevy::{
     mesh:: {Indices,  PrimitiveTopology},
 };
 
-mod profile;
+pub mod profile;
 use crate::profile::ElementProfile;
-// pub struct ProcedurallTrackPlugin;
-// impl Plugin for ProcedurallTrackPlugin {
-//     fn build(&self, app: &mut App) {
-//         app
-//             .add_observer(add_track)
-//         ;
-//     }
-// }
-
-// #[derive(Component)]
-// pub struct ProceduralTrack;
-
-
-// fn add_track(
-//     _tr: On<Add, ProceduralTrack >
-// ) {
-//     println!("added");
-
-// }
-
 pub struct SplainParams {
-    subdivision: usize,
-    tension: f32
+    pub subdivision: usize,
+    pub tension: f32,
+    pub cyclic: bool
 }
+
+impl SplainParams {
+    pub fn with_cyclic(mut self, cyclic: bool) -> Self {
+        self.cyclic = cyclic;
+        self
+    }
+}
+
 impl Default for SplainParams {
     fn default() -> Self {
         Self {
             subdivision: 120,
-            tension: 0.3
+            tension: 0.3,
+            cyclic: false
         }
     }
 }
 
-pub fn get_mesh(points: Vec<Vec3>, profile: impl  ElementProfile, spline_params: SplainParams) -> Mesh {
+// ---
+
+pub fn track_mesh(points: &Vec<(Vec3, Vec3)>,  profile: impl  ElementProfile) -> Mesh {
 
     let mut verts:Vec<[f32; 3]> = vec![];
     let mut idxs: Vec<u32> = vec![];
-
-    let cr = CubicCardinalSpline::new(spline_params.tension, points).to_curve().unwrap();
-
-    let itr = cr.iter_positions(spline_params.subdivision)
-        .zip(cr.iter_velocities(spline_params.subdivision))
-        .map(| ( p, v ) | ( p, -v.normalize().cross(Vec3::Y).normalize() ))
-        .collect::<Vec<_>>()
-    ;
-
-    for i in 0 .. itr.len() - 1 {
-        let current = itr[i];
-        let next = if i < itr.len() - 2  {itr[ i + 1]} else {itr[0]};
+    for i in 0 .. points.len() - 1 {
+        let current = points[i];
+        let next = points[ i + 1];
         profile.build(&current, &next, &mut verts, &mut idxs);
     }
 
