@@ -12,33 +12,31 @@ pub struct SplainParams {
     pub cyclic: bool
 }
 
-impl SplainParams {
-    pub fn with_cyclic(mut self, cyclic: bool) -> Self {
-        self.cyclic = cyclic;
-        self
-    }
-}
-
-impl Default for SplainParams {
-    fn default() -> Self {
-        Self {
-            subdivision: 120,
-            tension: 0.3,
-            cyclic: false
-        }
-    }
-}
-
 // ---
 
-pub fn track_mesh(points: &Vec<(Vec3, Vec3)>,  profile: impl  ElementProfile) -> Mesh {
+pub fn track_mesh(points: &Vec<(Vec3, Vec3)>,  profile: impl  ElementProfile, cyclic: bool) -> Mesh {
 
     let mut verts:Vec<[f32; 3]> = vec![];
     let mut idxs: Vec<u32> = vec![];
-    for i in 0 .. points.len() - 1 {
+    let mut prev_cut = vec![];
+
+    for i  in 0 .. points.len() - 1   {
         let current = points[i];
-        let next = points[ i + 1];
-        profile.build(&current, &next, &mut verts, &mut idxs);
+        let next = points[i + 1];
+
+        let cut = profile.cut(&current.0, &(next.0 - current.0).normalize(), &current.1);
+        if prev_cut.is_empty() {
+          prev_cut = profile.cut(&current.0, &(next.0 - current.0).normalize(), &current.1);
+        }
+        profile.build(&prev_cut, &cut, &mut verts, &mut idxs);
+        prev_cut = cut;
+    }
+
+    if cyclic {
+        let current = points[0];
+        let next = points[1];
+        let cut = profile.cut(&current.0, &(next.0 - current.0).normalize(), &current.1);
+        profile.build(&prev_cut, &cut, &mut verts, &mut idxs);
     }
 
     Mesh::new(

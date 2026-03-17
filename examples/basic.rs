@@ -1,5 +1,5 @@
 use bevy::{
-    camera_controller::free_camera::{FreeCamera, FreeCameraPlugin}, color::palettes::css, math::VectorSpace, pbr::wireframe::{Wireframe, WireframePlugin}, prelude::*
+    camera_controller::free_camera::{FreeCamera, FreeCameraPlugin}, color::palettes::css,  pbr::wireframe::{Wireframe, WireframePlugin}, prelude::*
 };
 use bevy_procedural_track::{track_mesh, profile::{EpFlat, EpBox, EpSquareChannel} };
 use bevy_random_loop::RandomLoop;
@@ -23,9 +23,9 @@ fn startup(
 ) {
     cmd.spawn((
         DirectionalLight{
-            illuminance: 8e2,
+            illuminance: 18e2,
             color: Color::WHITE,
-            shadows_enabled: true,
+            // shadows_enabled: true,
             ..default()
         },
         Transform::from_xyz(1.0, 2.0, 1.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -35,9 +35,9 @@ fn startup(
         Camera3d::default(),
         Camera::default(),
         FreeCamera::default(),
-        Transform::from_xyz(6., 300., -4.).looking_at(Vec3::ZERO , Vec3::Y),
+        Transform::from_xyz(200., 100., -4.).looking_at(Vec3::ZERO , Vec3::Y),
         AmbientLight {
-            brightness: 500.,
+            brightness: 100.,
             ..default()
         }
     ));
@@ -51,7 +51,6 @@ fn create_track(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
 
-
     let variation = 50.;
     let min_segment_len = 20.;
     let sub_div = 120;
@@ -60,19 +59,21 @@ fn create_track(
 
     let mut points = RandomLoop::generate(12, vec3(100., 0., 150.));
     RandomLoop::vary(&mut points, variation );
-    RandomLoop::smooth_out(&mut points , 120f32.to_radians(), min_segment_len);
+    RandomLoop::smooth_out(&mut points, 120f32.to_radians(), min_segment_len);
 
     let spline = CubicBSpline::new(points).to_curve_cyclic().unwrap();
     let points = spline.iter_positions(sub_div)
         .zip(spline.iter_velocities(sub_div))
-        .map(| ( p, v ) | ( p, -v.normalize().cross(Vec3::Y).normalize() ))
+        .map(| ( p, v ) | ( p, v.normalize().cross(Vec3::Y).normalize() ))
         .collect::<Vec<_>>()
     ;
-    let mesh = track_mesh(&points, EpFlat{half_width: 4.});
+    let mesh = track_mesh(&points, EpFlat{half_width: 4.}, true);
+
     let mesh = meshes.add(mesh);
     cmd.spawn((
         Mesh3d(mesh.clone()),
         MeshMaterial3d(materials.add(Color::from(css::ROYAL_BLUE))),
+        // Wireframe
     ));
 
     // --- Box Profile
@@ -83,33 +84,36 @@ fn create_track(
     let spline = CubicBSpline::new(points).to_curve_cyclic().unwrap();
     let points = spline.iter_positions(sub_div)
         .zip(spline.iter_velocities(sub_div))
-        .map(| ( p, v ) | ( p, -v.normalize().cross(Vec3::Y).normalize() ))
+        .map(| ( p, v ) | ( p, v.normalize().cross(Vec3::Y).normalize() ))
         .collect::<Vec<_>>()
     ;
-    let mesh = track_mesh(&points, EpBox{half_width: 4., half_height: 0.5});
+    let mesh = track_mesh(&points, EpBox{half_width: 4., half_height: 0.5}, true);
     let mesh = meshes.add(mesh);
     cmd.spawn((
         Transform::from_translation(Vec3::ZERO.with_y(10.)),
         Mesh3d(mesh.clone()),
         MeshMaterial3d(materials.add(Color::from(css::REBECCA_PURPLE))),
+        // Wireframe
     ));
 
     // -- SquareChannel Profile
 
-    let mut points = RandomLoop::generate(22, vec3(80., 0., 100.));
+    let mut points = RandomLoop::generate(22, vec3(80., 10., 100.));
     RandomLoop::vary(&mut points, variation);
     RandomLoop::smooth_out(&mut points , 110f32.to_radians(), min_segment_len);
     let spline = CubicBSpline::new(points).to_curve_cyclic().unwrap();
     let points = spline.iter_positions(sub_div)
         .zip(spline.iter_velocities(sub_div))
-        .map(| ( p, v ) | ( p, -v.normalize().cross(Vec3::Y).normalize() ))
+        .map(| ( p, v ) | ( p, v.normalize().cross(Vec3::Y).normalize() ))
         .collect::<Vec<_>>()
     ;
-    let mesh = track_mesh(&points, EpSquareChannel{half_width: 4.,  height: 2., depth: 1.8, border_width: 0.5});
+    let mesh = track_mesh(&points, EpSquareChannel{half_width: 4.,  height: 2., depth: 1.8, border_width: 0.5}, true);
     let mesh = meshes.add(mesh);
     cmd.spawn((
         Transform::from_translation(Vec3::ZERO.with_y(20.)),
         Mesh3d(mesh.clone()),
         MeshMaterial3d(materials.add(Color::from(css::SEA_GREEN))),
+        // Wireframe
     ));
+
 }

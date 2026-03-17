@@ -1,113 +1,70 @@
 use bevy::prelude::*;
 pub trait ElementProfile {
-    fn build(&self, current: &(Vec3, Vec3), next: &(Vec3, Vec3),  verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>);
-    fn shoulders(current: &(Vec3, Vec3), next: &(Vec3, Vec3), half_width: f32) -> ((Vec3, Vec3), (Vec3, Vec3)) {
-        (
-            ( current.0 - current.1 * half_width, current.0 + current.1 * half_width),
-            ( next.0 - next.1 * half_width, next.0 + next.1 * half_width)
-        )
+    fn cut(&self,  base: &Vec3, tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3>;
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>);
+    fn normal(tangent: &Vec3, bnormal: &Vec3)-> Vec3 {
+          -tangent.normalize().cross(bnormal.normalize()).normalize()
     }
 }
 
-#[allow(dead_code)]
-pub struct EpFlat { pub half_width: f32 }
+pub struct EpFlat{pub half_width: f32}
 impl ElementProfile for EpFlat {
-    fn build(&self, current: &(Vec3, Vec3), next: &(Vec3, Vec3),  verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
-        let (current, next) = Self::shoulders(current, next, self.half_width);
-        let j = verts.len() as u32;
-        verts.extend_from_slice(&[
-            current.0.to_array(), current.1.to_array(),  next.0.to_array(), next.1.to_array(),
-        ]);
+    fn cut(&self, base: &Vec3, _tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3> {
+        vec![
+            base - bnormal * self.half_width, base  +  bnormal * self.half_width,
+        ]
+    }
+
+    // ---
+
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
+        let j =  verts.len() as u32;
+        verts.extend(vec![
+            prev[0], prev[1], current[0], current[1],
+            ].iter().map(Vec3::to_array)
+        );
         idxs.extend_from_slice(&[
-            j, j + 2, j + 1,
-            j + 2, j + 3, j + 1
+            j, j + 1, j + 2,
+            j + 2, j + 1, j + 3,
         ]);
     }
 }
 
-#[allow(dead_code)]
-pub struct EpBox { pub half_width: f32, pub half_height: f32 }
-// impl ElementProfile for EpBox {
-//     fn build(&self, current: &(Vec3, Vec3), next: &(Vec3, Vec3),  verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
-//         let (current, next) = Self::shoulders(current, next, self.half_width);
-//         let j =  verts.len() as u32;
-//         let norm = (current.1 - current.0).normalize().cross((current.0 - next.0).normalize()).normalize();
-//         let top = vec![current.0, current.1, next.0, next.1]
-//             .iter()
-//             .map(| e | (e + norm * self.half_height).to_array())
-//             .collect::<Vec<_>>();
-//         let bottom = vec![current.0, current.1, next.0, next.1]
-//             .iter()
-//             .map(| e | (e - norm * self.half_height).to_array())
-//             .collect::<Vec<_>>();
-//         let right = vec![current.1 - norm * self.half_height, next.1 - norm * self.half_height , current.1 + norm * self.half_height, next.1 + norm * self.half_height]
-//             .iter()
-//             .map(|e| e.to_array())
-//             .collect::<Vec<_>>();
-//         let left = vec![current.0 - norm * self.half_height, next.0 - norm * self.half_height , current.0 + norm * self.half_height, next.0 + norm * self.half_height]
-//             .iter()
-//             .map(|e| e.to_array())
-//             .collect::<Vec<_>>()
-//         ;
+// -----------------------------------
 
-//         verts.extend_from_slice(&top);
-//         verts.extend_from_slice(&bottom);
-//         verts.extend_from_slice(&right);
-//         verts.extend_from_slice(&left);
-
-//         idxs.extend_from_slice(&[
-//             j, j + 2, j + 1,
-//             j + 2, j + 3, j + 1,
-
-//             j + 5, j + 6, j + 4,
-//             j + 6, j + 5, j + 7,
-
-//             j + 8, j + 10, j + 9,
-//             j + 9, j + 10, j + 11,
-
-//             j + 14, j + 12, j + 13,
-//             j + 14, j + 13, j + 15,
-//         ]);
-//     }
-// }
-
+pub struct EpBox {pub half_width: f32, pub half_height: f32}
 impl ElementProfile for EpBox {
-    fn build(&self, current: &(Vec3, Vec3), next: &(Vec3, Vec3),  verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
-        let (current, next) = Self::shoulders(current, next, self.half_width);
+    fn cut(&self,  base: &Vec3, tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3> {
+        let normal  = Self::normal(tangent, bnormal);
+        vec![
+             -normal * self.half_height - bnormal * self.half_width,
+            -normal * self.half_height + bnormal * self.half_width,
+            normal * self.half_height + bnormal * self.half_width,
+            normal * self.half_height - bnormal * self.half_width,
+        ]. iter().map(| p |  base + p ).collect::<Vec<_>>()
+    }
+
+    // ---
+
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
         let j =  verts.len() as u32;
-        let norm = (current.1 - current.0).normalize().cross((current.0 - next.0).normalize()).normalize();
-        let top = vec![current.0, current.1, next.0, next.1]
-            .iter()
-            .map(| e | (e + norm * self.half_height).to_array())
-            .collect::<Vec<_>>();
-        let bottom = vec![current.0, current.1, next.0, next.1]
-            .iter()
-            .map(| e | (e - norm * self.half_height).to_array())
-            .collect::<Vec<_>>();
-        let right = vec![current.1 - norm * self.half_height, next.1 - norm * self.half_height , current.1 + norm * self.half_height, next.1 + norm * self.half_height]
-            .iter()
-            .map(|e| e.to_array())
-            .collect::<Vec<_>>();
-        let left = vec![current.0 - norm * self.half_height, next.0 - norm * self.half_height , current.0 + norm * self.half_height, next.0 + norm * self.half_height]
-            .iter()
-            .map(|e| e.to_array())
-            .collect::<Vec<_>>()
-        ;
-
-        verts.extend_from_slice(&top);
-        verts.extend_from_slice(&bottom);
-        verts.extend_from_slice(&right);
-        verts.extend_from_slice(&left);
-
+        verts.extend(
+            vec![
+                prev[3], prev[2], current[3], current[2],  // top
+                prev[0], prev[1], current[0], current[1],   // bottom
+                prev[1], current[1], prev[2], current[2],   // right
+                current[0], prev[0], current[3], prev[3]   // left
+            ].iter().map(Vec3::to_array)
+        );
         idxs.extend_from_slice(&[
-            j, j + 2, j + 1,
-            j + 2, j + 3, j + 1,
+            j, j + 1, j + 2,
+            j + 2, j + 1, j + 3,
 
-            j + 5, j + 6, j + 4,
-            j + 6, j + 5, j + 7,
+            j + 5, j + 4, j + 6,
+            j + 6, j + 7, j + 5,
 
-            j + 8, j + 10, j + 9,
-            j + 9, j + 10, j + 11,
+            j + 8, j + 9, j + 10,
+            j + 9, j + 11, j + 10,
 
             j + 14, j + 12, j + 13,
             j + 14, j + 13, j + 15,
@@ -115,71 +72,43 @@ impl ElementProfile for EpBox {
     }
 }
 
+// -------------------------------
 
-#[allow(dead_code)]
-pub struct EpSquareChannel { pub half_width: f32, pub height: f32, pub depth: f32, pub border_width: f32}
+pub struct EpSquareChannel {pub half_width: f32, pub height: f32, pub depth: f32, pub border_width: f32}
 impl ElementProfile for EpSquareChannel {
-    fn build(&self, current: &(Vec3, Vec3), next: &(Vec3, Vec3),  verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
-        let (current, next) = Self::shoulders(current, next, self.half_width);
-        let j = verts.len() as u32;
-        let across = (current.1 - current.0).normalize();
-        let along = (next.0 - current.0).normalize();
-        let up = -across.cross(along).normalize();
+    fn cut(&self,  base: &Vec3, tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3> {
+        let normal = Self::normal(tangent, bnormal);
 
+        vec![
+            -bnormal * self.half_width,
+            bnormal * self.half_width,
+            normal * self.height + bnormal * self.half_width ,
+            normal * self.height + bnormal * (self.half_width - self.border_width),
+            normal * (self.height - self.depth) + bnormal * (self.half_width - self.border_width),
+            normal * (self.height - self.depth) - bnormal * (self.half_width - self.border_width),
+            normal * self.height - bnormal * (self.half_width -self. border_width),
+            normal * self.height - bnormal * self.half_width ,
+        ].iter().map(| p | base + p ).collect::<Vec<_>>()
 
-        verts.extend(vec![
-            // inner left
-            current.0 + across * self.border_width + up * (self.height - self.depth),
-            next.0 + across * self.border_width + up * (self.height - self.depth),
-            current.0 + across * self.border_width + up * self.height,
-            next.0 + across * self.border_width + up * self.height,
-            // inner right
-            current.1 - across * self.border_width + up * (self.height - self.depth),
-            next.1 - across * self.border_width + up * (self.height - self.depth),
-            current.1 - across * self.border_width + up * self.height,
-            next.1 - across * self.border_width + up * self.height,
+    }
 
-            // middle
-            current.0 + across * self.border_width + up * (self.height - self.depth),
-            current.1 - across * self.border_width + up * (self.height - self.depth),
-            next.0 + across * self.border_width + up * (self.height - self.depth),
-            next.1 - across * self.border_width + up * (self.height - self.depth),
+    // ---
 
-             // r -border
-            current.1 + up * self.height - across * self.border_width,
-            current.1 + up * self.height,
-            next.1 + up * self.height - across * self.border_width,
-            next.1 + up * self.height,
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
+        let j =  verts.len() as u32;
+        verts.extend(
+            vec![
+                prev[0], prev[1], current[0], current[1],  //bottom
+                prev[5], prev[4], current[5], current[4], // top
+                prev[3], prev[2], current[3], current[2], // rigth border
+                prev[7], prev[6], current[7], current[6], // left border
+                current[4], prev[4], current[3], prev[3], // rigth inner
+                prev[5], current[5], prev[6], current[6], // left inner
+                prev[1], current[1], prev[2], current[2], // rigth outer
+                current[0], prev[0], current[7], prev[7], // left outer
 
-             // l -border
-            current.0 + up * self.height,
-            current.0 + up * self.height + across * self.border_width,
-            next.0 + up * self.height,
-            next.0 + up * self.height + across * self.border_width,
-
-            // right
-            current.1,
-            next.1,
-            current.1 + up * self.height,
-            next.1 + up * self.height,
-
-            // left
-            current.0,
-            next.0,
-            current.0 + up * self.height,
-            next.0 +  up * self.height,
-
-            // bottom
-            current.0,
-            current.1,
-            next.0,
-            next.1,
-        ]
-        .iter()
-        .map(Vec3::to_array)
+            ].iter().map(Vec3::to_array)
         );
-        // println!("{:?}", vs);
-
         idxs.extend_from_slice(&[
             j, j + 2, j + 1,
             j + 2, j + 3, j + 1,
@@ -187,24 +116,24 @@ impl ElementProfile for EpSquareChannel {
             j + 6, j + 4, j + 5,
             j + 5, j + 7, j + 6,
 
-            j + 8, j + 10, j + 9,
-            j + 9, j + 10, j + 11,
+            j + 8, j + 9, j + 10,
+            j + 9, j + 11, j + 10,
 
-            j + 14, j + 13, j + 12,
-            j + 14, j + 15, j + 13,
+            j + 14, j + 12, j + 13,
+            j + 14, j + 13, j + 15,
 
-            j + 18, j + 17, j + 16,
-            j + 18, j + 19, j + 17,
+            j + 18, j + 16, j + 17,
+            j + 18, j + 17, j + 19,
 
-            j + 21, j + 20, j + 22,
-            j + 21, j + 22, j + 23,
+            j + 21, j + 22, j + 20,
+            j + 21, j + 23, j + 22,
 
             j + 25, j + 26, j + 24,
             j + 25, j + 27, j + 26,
 
-            j + 29, j + 28, j + 30,
-            j + 29, j + 30, j + 31,
+            j + 29, j + 30, j + 28,
+            j + 29, j + 31, j + 30,
         ]);
-
     }
+
 }
