@@ -33,3 +33,6 @@ features = ["3d"]
 
 [[example]]
 name = "basic"
+
+[[example]]
+name = "textured"

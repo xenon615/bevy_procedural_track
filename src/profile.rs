@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 pub trait ElementProfile {
     fn cut(&self,  base: &Vec3, tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3>;
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>);
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>);
     fn normal(tangent: &Vec3, bnormal: &Vec3)-> Vec3 {
           -tangent.normalize().cross(bnormal.normalize()).normalize()
     }
@@ -17,7 +17,7 @@ impl ElementProfile for EpFlat {
 
     // ---
 
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]> ) {
         let j =  verts.len() as u32;
         verts.extend(vec![
             prev[0], prev[1], current[0], current[1],
@@ -26,6 +26,10 @@ impl ElementProfile for EpFlat {
         idxs.extend_from_slice(&[
             j, j + 1, j + 2,
             j + 2, j + 1, j + 3,
+        ]);
+
+        uvs.extend_from_slice(&[
+            [1.0, 1.0], [0.0, 1.0], [1.0, 0.0], [0., 0.],
         ]);
     }
 }
@@ -46,7 +50,7 @@ impl ElementProfile for EpBox {
 
     // ---
 
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>) {
         let j =  verts.len() as u32;
         verts.extend(
             vec![
@@ -69,12 +73,19 @@ impl ElementProfile for EpBox {
             j + 14, j + 12, j + 13,
             j + 14, j + 13, j + 15,
         ]);
+
+        uvs.extend_from_slice(&[
+            [1.0, 0.5], [0.0, 0.5], [1.0, 0.0], [0., 0.], // top
+            [1.0, 0.6], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // bottom
+            [1.0, 1.0], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // right
+            [1.0, 1.0], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // left
+        ]);
     }
 }
 
 // -------------------------------
 
-pub struct EpSquareChannel {pub half_width: f32, pub height: f32, pub depth: f32, pub border_width: f32}
+pub struct EpSquareChannel {pub half_width: f32, pub height: f32, pub depth: f32, pub border_width: f32 }
 impl ElementProfile for EpSquareChannel {
     fn cut(&self,  base: &Vec3, tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3> {
         let normal = Self::normal(tangent, bnormal);
@@ -94,7 +105,7 @@ impl ElementProfile for EpSquareChannel {
 
     // ---
 
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>) {
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, _uvs: &mut Vec<[f32;2]>) {
         let j =  verts.len() as u32;
         verts.extend(
             vec![
