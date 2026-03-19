@@ -85,7 +85,8 @@ fn create_track(
     // let mesh_mat = materials.add(Color::from(css::ROYAL_BLUE));
 
     let mesh_mat = materials.add(StandardMaterial {
-        base_color_texture: Some(assets.load("textures/road2.png")),
+        // base_color_texture: Some(assets.load("textures/road_flat.png")),
+        base_color_texture: Some(assets.load("textures/road_box.png")),
         // base_color: Color::from(css::GOLDENROD),
         ..default()
     });
