@@ -8,11 +8,11 @@ I had to do it myself, but I did it as best I could. Feel free to use it if you 
 3 Square Channel (green)
 4 Custom  (please refer to ([custom_profile](/examples/custom_profile.rs)))
 
-![three in one](img/img1.png)  
+![three in one](img/img1.png)    
  you can use texture  
  ![texturized](img/img2.png)  
  and here's a stupid triangular profile as a case of a custom profile  
- ![texturized](img/img2.png)
+ ![texturized](img/img3.png)  
 
 ## How to use it
 (please refer to ([basic example](/examples/basic.rs)))
