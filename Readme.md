@@ -34,12 +34,24 @@ or any formula to your taste, for example
     
 ```
 
-then apply the spline and calculate bnormal
+then apply the spline and calculate binormal
 ```rust
-let spline = CubicBSpline::new(points).to_curve_cyclic().unwrap();
+let spline = CubicBSpline::new(points).to_curve_cyclic().unwrap();  //  to_curve_cyclic()  for closed path  to_curve  - otherwise
     let points = spline.iter_positions(sub_div)
         .zip(spline.iter_velocities(sub_div))
         .map(| ( p, v ) | ( p, v.normalize().cross(Vec3::Y).normalize() ))
         .collect::<Vec<_>>()
     ;
+```
+then build the mesh 
+
+```rust
+let mesh = track_mesh(&points, EpFlat{half_width: 4.}, true);
+
+    let mesh = meshes.add(mesh);
+    cmd.spawn((
+        Mesh3d(mesh.clone()),
+        MeshMaterial3d(materials.add(Color::from(css::ROYAL_BLUE))),
+    ));
+
 ```
