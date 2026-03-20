@@ -17,7 +17,7 @@ I had to do it myself, but I did it as best I could. Feel free to use it if you 
  ![texturized](img/img3.png)  
 
 ## How to use it
-(please refer to ([basic example](/examples/basic.rs)))
+please refer to ([basic example](/examples/basic.rs))
 
 ### Need a source of points 
 (Vector of Vec3)
