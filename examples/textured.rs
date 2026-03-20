@@ -3,7 +3,7 @@
 use bevy::{
     camera_controller::free_camera::{FreeCamera, FreeCameraPlugin},  prelude::*
 };
-use bevy_procedural_track::{track_mesh, profile::EpSquareChannel };
+use bevy_procedural_track::{profile::{EpFlat, EpSquareChannel}, track_mesh };
 use bevy_random_loop::RandomLoop;
 
 fn main () {
@@ -74,6 +74,7 @@ fn create_track(
     ;
 
     let mesh = track_mesh(&points, EpSquareChannel{half_width: 1., height: 0.5, depth: 0.35, border_width: 0.2}, true);
+
 
     //You may want to use your own UV according to your texture.
     // something like this, for example

@@ -17,21 +17,21 @@ pub fn track_mesh(points: &Vec<(Vec3, Vec3)>,  profile: impl  ElementProfile, cy
     let mut prev_cut = vec![];
 
     for i  in 0 .. points.len() - 1   {
-        let current = points[i];
-        let next = points[i + 1];
+        let near = points[i];
+        let far = points[i + 1];
 
-        let cut = profile.cut(&current.0, &(next.0 - current.0).normalize(), &current.1);
+        let cut = profile.cut(&near.0, &(far.0 - near.0).normalize(), &near.1);
         if prev_cut.is_empty() {
-          prev_cut = profile.cut(&current.0, &(next.0 - current.0).normalize(), &current.1);
+          prev_cut = profile.cut(&near.0, &(far.0 - near.0).normalize(), &near.1);
         }
         profile.build(&prev_cut, &cut, &mut verts, &mut idxs, &mut uvs);
         prev_cut = cut;
     }
 
     if cyclic {
-        let current = points[0];
-        let next = points[1];
-        let cut = profile.cut(&current.0, &(next.0 - current.0).normalize(), &current.1);
+        let near = points[0];
+        let far = points[1];
+        let cut = profile.cut(&near.0, &(far.0 - near.0).normalize(), &near.1);
         profile.build(&prev_cut, &cut, &mut verts, &mut idxs, &mut uvs);
     }
 
@@ -40,7 +40,7 @@ pub fn track_mesh(points: &Vec<(Vec3, Vec3)>,  profile: impl  ElementProfile, cy
         RenderAssetUsages::MAIN_WORLD | RenderAssetUsages::RENDER_WORLD
     )
     .with_inserted_attribute( Mesh::ATTRIBUTE_POSITION, verts)
-    // .with_inserted_attribute( Mesh::ATTRIBUTE_UV_0, uvs)
+    .with_inserted_attribute( Mesh::ATTRIBUTE_UV_0, uvs)
     .with_inserted_indices(Indices::U32(idxs))
     .with_computed_normals()
 }

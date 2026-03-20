@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 pub trait ElementProfile {
+    /// Cut of profile
     fn cut(&self,  base: &Vec3, tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3>;
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>);
+    /// construction of a profile element from a near and far cut
+    fn build(&self, near: &Vec<Vec3>, far: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>);
     fn normal(tangent: &Vec3, bnormal: &Vec3)-> Vec3 {
           -tangent.normalize().cross(bnormal.normalize()).normalize()
     }
@@ -18,10 +20,10 @@ impl ElementProfile for EpFlat {
 
     // ---
 
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]> ) {
+    fn build(&self, near: &Vec<Vec3>, far: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]> ) {
         let j =  verts.len() as u32;
         verts.extend(vec![
-            prev[0], prev[1], current[0], current[1],
+            near[0], near[1], far[0], far[1],
             ].iter().map(Vec3::to_array)
         );
         idxs.extend_from_slice(&[
@@ -51,14 +53,14 @@ impl ElementProfile for EpBox {
 
     // ---
 
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>) {
+    fn build(&self, near: &Vec<Vec3>, far: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>) {
         let j =  verts.len() as u32;
         verts.extend(
             vec![
-                prev[3], prev[2], current[3], current[2],  // top
-                prev[0], prev[1], current[0], current[1],   // bottom
-                prev[1], current[1], prev[2], current[2],   // right
-                current[0], prev[0], current[3], prev[3]   // left
+                near[3], near[2], far[3], far[2],  // top
+                near[0], near[1], far[0], far[1],   // bottom
+                near[1], far[1], near[2], far[2],   // right
+                far[0], near[0], far[3], near[3]   // left
             ].iter().map(Vec3::to_array)
         );
         idxs.extend_from_slice(&[
@@ -106,18 +108,18 @@ impl ElementProfile for EpSquareChannel {
 
     // ---
 
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>) {
+    fn build(&self, near: &Vec<Vec3>, far: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>) {
         let j =  verts.len() as u32;
         verts.extend(
             vec![
-                prev[0], prev[1], current[0], current[1],  //bottom
-                prev[5], prev[4], current[5], current[4], // top
-                prev[3], prev[2], current[3], current[2], // rigth border
-                prev[7], prev[6], current[7], current[6], // left border
-                current[4], prev[4], current[3], prev[3], // rigth inner
-                prev[5], current[5], prev[6], current[6], // left inner
-                prev[1], current[1], prev[2], current[2], // rigth outer
-                current[0], prev[0], current[7], prev[7], // left outer
+                near[0], near[1], far[0], far[1],  //bottom
+                near[5], near[4], far[5], far[4], // top
+                near[3], near[2], far[3], far[2], // rigth border
+                near[7], near[6], far[7], far[6], // left border
+                far[4], near[4], far[3], near[3], // rigth inner
+                near[5], far[5], near[6], far[6], // left inner
+                near[1], far[1], near[2], far[2], // rigth outer
+                far[0], near[0], far[7], near[7], // left outer
 
             ].iter().map(Vec3::to_array)
         );
