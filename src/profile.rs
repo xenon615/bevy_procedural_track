@@ -6,6 +6,7 @@ pub trait ElementProfile {
           -tangent.normalize().cross(bnormal.normalize()).normalize()
     }
 }
+/// Flat track profile
 
 pub struct EpFlat{pub half_width: f32}
 impl ElementProfile for EpFlat {
@@ -35,13 +36,13 @@ impl ElementProfile for EpFlat {
 }
 
 // -----------------------------------
-
+/// Box-like track profile
 pub struct EpBox {pub half_width: f32, pub half_height: f32}
 impl ElementProfile for EpBox {
     fn cut(&self,  base: &Vec3, tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3> {
         let normal  = Self::normal(tangent, bnormal);
         vec![
-             -normal * self.half_height - bnormal * self.half_width,
+            -normal * self.half_height - bnormal * self.half_width,
             -normal * self.half_height + bnormal * self.half_width,
             normal * self.half_height + bnormal * self.half_width,
             normal * self.half_height - bnormal * self.half_width,
@@ -84,7 +85,7 @@ impl ElementProfile for EpBox {
 }
 
 // -------------------------------
-
+/// Square Channel track profile
 pub struct EpSquareChannel {pub half_width: f32, pub height: f32, pub depth: f32, pub border_width: f32 }
 impl ElementProfile for EpSquareChannel {
     fn cut(&self,  base: &Vec3, tangent: &Vec3, bnormal: &Vec3) -> Vec<Vec3> {
@@ -105,7 +106,7 @@ impl ElementProfile for EpSquareChannel {
 
     // ---
 
-    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, _uvs: &mut Vec<[f32;2]>) {
+    fn build(&self, prev: &Vec<Vec3>, current: &Vec<Vec3>, verts: &mut Vec<[f32; 3]>, idxs: &mut Vec<u32>, uvs: &mut Vec<[f32;2]>) {
         let j =  verts.len() as u32;
         verts.extend(
             vec![
@@ -145,6 +146,19 @@ impl ElementProfile for EpSquareChannel {
             j + 29, j + 30, j + 28,
             j + 29, j + 31, j + 30,
         ]);
+
+        uvs.extend_from_slice(&[
+            [1.0, 0.6], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // bottom
+            [1.0, 0.5], [0.0, 0.5], [1.0, 0.0], [0., 0.], // top
+            [1.0, 0.6], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // right border
+            [1.0, 0.6], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // left border
+            [1.0, 0.6], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // right inner
+            [1.0, 0.6], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // left inner
+            [1.0, 0.6], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // right outer
+            [1.0, 0.6], [0.0, 1.0], [1.0, 0.6], [0., 0.6], // left outer
+
+        ]);
+
     }
 
 }

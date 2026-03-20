@@ -5,12 +5,7 @@ use bevy::{
 };
 
 pub mod profile;
-use crate::profile::ElementProfile;
-pub struct SplainParams {
-    pub subdivision: usize,
-    pub tension: f32,
-    pub cyclic: bool
-}
+pub use crate::profile::ElementProfile;
 
 // ---
 
@@ -45,7 +40,7 @@ pub fn track_mesh(points: &Vec<(Vec3, Vec3)>,  profile: impl  ElementProfile, cy
         RenderAssetUsages::MAIN_WORLD | RenderAssetUsages::RENDER_WORLD
     )
     .with_inserted_attribute( Mesh::ATTRIBUTE_POSITION, verts)
-    .with_inserted_attribute( Mesh::ATTRIBUTE_UV_0, uvs)
+    // .with_inserted_attribute( Mesh::ATTRIBUTE_UV_0, uvs)
     .with_inserted_indices(Indices::U32(idxs))
     .with_computed_normals()
 }

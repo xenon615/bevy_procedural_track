@@ -1,3 +1,4 @@
+// An example of closed tracks based on 3 different profiles
 use bevy::{
     camera_controller::free_camera::{FreeCamera, FreeCameraPlugin}, color::palettes::css,  pbr::wireframe::{Wireframe, WireframePlugin}, prelude::*
 };
@@ -25,7 +26,6 @@ fn startup(
         DirectionalLight{
             illuminance: 18e2,
             color: Color::WHITE,
-            // shadows_enabled: true,
             ..default()
         },
         Transform::from_xyz(1.0, 2.0, 1.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -56,10 +56,14 @@ fn create_track(
     let sub_div = 120;
 
     // --- Flat Profile
+    // Generate random closed path
+    // Refer to  https://github.com/xenon615/bevy_random_loop for details
 
     let mut points = RandomLoop::generate(12, vec3(100., 0., 150.));
     RandomLoop::vary(&mut points, variation );
     RandomLoop::smooth_out(&mut points, 120f32.to_radians(), min_segment_len);
+
+    // We smooth it using a spline.
 
     let spline = CubicBSpline::new(points).to_curve_cyclic().unwrap();
     let points = spline.iter_positions(sub_div)
@@ -67,6 +71,10 @@ fn create_track(
         .map(| ( p, v ) | ( p, v.normalize().cross(Vec3::Y).normalize() ))
         .collect::<Vec<_>>()
     ;
+    // We get an array of points and their binormals.
+    // The accuracy of the binormals may be questionable, but at least it works.
+
+    // let's create a closed flat route with a half-width of 4
     let mesh = track_mesh(&points, EpFlat{half_width: 4.}, true);
 
     let mesh = meshes.add(mesh);

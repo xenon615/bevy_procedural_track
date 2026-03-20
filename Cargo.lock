@@ -1176,6 +1176,7 @@ checksum = "4f98cbc6d34bbdb58240b72ed1731931b4991a893b3a3238bb7c42ae054aa676"
 [[package]]
 name = "bevy_random_loop"
 version = "0.1.0"
+source = "git+https://github.com/xenon615/bevy_random_loop.git#261ede39a638fad0a60ef699e00fc3257f6097c2"
 dependencies = [
  "bevy",
  "fastrand",
