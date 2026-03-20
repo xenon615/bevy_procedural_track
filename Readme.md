@@ -3,15 +3,17 @@ I probably invented the wheel. But I needed a random track, I searched around an
 I had to do it myself, but I did it as best I could. Feel free to use it if you need it.
 
 ## So, what profiles do we have?
-1 Flat (blue)
-2 Box (purple)
-3 Square Channel (green)
-4 Custom  (please refer to ([custom_profile](/examples/custom_profile.rs)))
+1 Flat (blue)  
+2 Box (purple)  
+3 Square Channel (green)  
+4 Custom  (please refer to ([custom_profile](/examples/custom_profile.rs)))  
 
 ![three in one](img/img1.png)    
  you can use texture  
+ 
  ![texturized](img/img2.png)  
  and here's a stupid triangular profile as a case of a custom profile  
+ 
  ![texturized](img/img3.png)  
 
 ## How to use it
