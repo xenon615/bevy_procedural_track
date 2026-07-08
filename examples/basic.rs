@@ -1,6 +1,7 @@
 // An example of closed tracks based on 3 different profiles
 use bevy::{
-    camera_controller::free_camera::{FreeCamera, FreeCameraPlugin}, color::palettes::css,  pbr::wireframe::{Wireframe, WireframePlugin}, prelude::*
+    camera_controller::free_camera::{FreeCamera, FreeCameraPlugin}, color::palettes::css,
+    prelude::*
 };
 use bevy_procedural_track::{track_mesh, profile::{EpFlat, EpBox, EpSquareChannel} };
 use bevy_random_loop::RandomLoop;
@@ -10,7 +11,6 @@ fn main () {
         .add_plugins((
             DefaultPlugins,
             FreeCameraPlugin,
-            WireframePlugin::default()
         ))
         .add_systems(Startup, (startup, create_track))
         .run();

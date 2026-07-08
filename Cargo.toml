@@ -2,6 +2,9 @@
 name = "bevy_procedural_track"
 version = "0.1.0"
 edition = "2024"
+authors = ["xenon615"]
+keywords = ["gamedev", "bevy", "procedural"]
+categories = ["game-development"]
 
 [profile.dev]
 opt-level = 1
@@ -12,30 +15,34 @@ opt-level = 3
 [profile.release]
 codegen-units = 1
 # opt-level = 'z' # wasm less size.
-
-
-[dependencies]
-fastrand = "2.3.0"
-
 [dev-dependencies]
 bevy_random_loop = {git= "https://github.com/xenon615/bevy_random_loop.git"}
-# avian3d = "0.5.0"
+avian3d = "0.7.0"
+# bevy_random_loop = {path= "../bevy_random_loop"}
+
 
 [dev-dependencies.bevy]
-version = "0.18.1"
+version = "0.19.0"
 default-features = false
 features = ["3d", "free_camera", "dynamic_linking"]
 
 [dependencies.bevy]
-version = "0.18.*"
+version = "0.19.*"
 default-features = false
 features = ["3d"]
 
 [[example]]
 name = "basic"
+# path = "../examples/basic.rs"
 
 [[example]]
 name = "textured"
+# path = "examples/textured.rs"
 
 [[example]]
 name = "custom_profile"
+# path = "../examples/custom_profile.rs"
+
+[[example]]
+name = "with_collider"
+# path = "physics/src/main.rs"

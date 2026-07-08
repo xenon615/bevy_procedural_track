@@ -3,7 +3,7 @@
 use bevy::{
     camera_controller::free_camera::{FreeCamera, FreeCameraPlugin},  prelude::*
 };
-use bevy_procedural_track::{profile::{EpFlat, EpSquareChannel}, track_mesh };
+use bevy_procedural_track::{profile::{EpSquareChannel}, track_mesh };
 use bevy_random_loop::RandomLoop;
 
 fn main () {

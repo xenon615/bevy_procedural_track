@@ -1,26 +1,18 @@
 // An example showing the creation of a route with a custom triangular cross-section profile
 use bevy::{
-    camera_controller::free_camera::{FreeCamera, FreeCameraPlugin}, color::palettes::css,  pbr::wireframe::{Wireframe, WireframePlugin}, prelude::*
+    camera_controller::free_camera::{FreeCamera, FreeCameraPlugin},
+    color::palettes::css, prelude::*
 };
 use bevy_procedural_track::{ElementProfile, track_mesh};
-use bevy_random_loop::RandomLoop;
 fn main () {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins((
-            DefaultPlugins.set (
-                AssetPlugin {
-                    file_path: "examples/assets".to_string(),
-                    ..default()
-                }
-            ),
-
+            DefaultPlugins,
             FreeCameraPlugin,
-            WireframePlugin::default()
         ))
         .add_systems(Startup, (startup, create_track))
         .run();
-
 }
 
 // ---
@@ -96,7 +88,6 @@ fn create_track(
     mut cmd: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    // assets: ResMut<AssetServer>
 ) {
 
     let sub_div = 120;
@@ -113,7 +104,6 @@ fn create_track(
     let mesh = meshes.add(mesh);
 
     let mesh_mat = materials.add(StandardMaterial {
-        // base_color_texture: Some(assets.load("textures/road_flat.png")),
         base_color: Color::from(css::ROYAL_BLUE),
         ..default()
     });
@@ -121,6 +111,5 @@ fn create_track(
     cmd.spawn((
         Mesh3d(mesh.clone()),
         MeshMaterial3d(mesh_mat.clone()),
-        // Wireframe
     ));
 }

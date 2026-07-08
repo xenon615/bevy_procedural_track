@@ -14,7 +14,11 @@ I had to do it myself, but I did it as best I could. Feel free to use it if you 
  ![texturized](img/img2.png)  
  and here's a stupid triangular profile as a case of a custom profile  
  
- ![texturized](img/img3.png)  
+ ![custom](img/img3.png)  
+
+ ![with_collider](img/img4.png)  
+ And Of course, we can use the collider
+ 
 
 ## How to use it
 please refer to ([basic example](/examples/basic.rs))
