@@ -16,8 +16,10 @@ I had to do it myself, but I did it as best I could. Feel free to use it if you 
  
  ![custom](img/img3.png)  
 
+ 
+ And of course, we can use the collider
+
  ![with_collider](img/img4.png)  
- And Of course, we can use the collider
  
 
 ## How to use it
