@@ -7,32 +7,34 @@ use bevy::{
 pub mod profile;
 pub use crate::profile::ElementProfile;
 
-// ---
-
-pub fn track_mesh(points: &Vec<(Vec3, Vec3)>,  profile: impl  ElementProfile, cyclic: bool) -> Mesh {
-
+///Used for creation track mesh
+// parameters:
+///points: vector of tuples of position and binormal
+///profile: profile of mesh cut (can be custom)
+///start_normal and end_normal are normals of first cut and last cut respectively
+pub fn track_mesh(points: &Vec<(Vec3, Vec3)>,  profile: impl  ElementProfile, start_normal: Option<Vec3>, end_normal: Option<Vec3>) -> Mesh {
     let mut verts:Vec<[f32; 3]> = vec![];
     let mut idxs: Vec<u32> = vec![];
     let mut uvs: Vec<[f32; 2]> = vec![];
     let mut prev_cut = vec![];
+    let mut idx = 0;
+    let mut points_iter = points.iter().peekable();
+    while let Some(current) = points_iter.next() {
 
-    for i  in 0 .. points.len() - 1   {
-        let near = points[i];
-        let far = points[i + 1];
+        let normal = match points_iter.peek() {
+            Some(_) if idx == 0  && start_normal.is_some() =>  {
+                idx += 1;
+                start_normal.unwrap()
+            },
+            Some(next) => next.0 - current.0,
+            None => if let Some(normal) = end_normal  { normal} else {current.0 - points[points.len() -2].0}
+        }.normalize();
 
-        let cut = profile.cut(&near.0, &(far.0 - near.0).normalize(), &near.1);
-        if prev_cut.is_empty() {
-          prev_cut = profile.cut(&near.0, &(far.0 - near.0).normalize(), &near.1);
+        let cut = profile.cut(&current.0, &normal, &current.1);
+        if !prev_cut.is_empty() {
+            profile.build(&prev_cut, &cut, &mut verts, &mut idxs, &mut uvs);
         }
-        profile.build(&prev_cut, &cut, &mut verts, &mut idxs, &mut uvs);
         prev_cut = cut;
-    }
-
-    if cyclic {
-        let near = points[0];
-        let far = points[1];
-        let cut = profile.cut(&near.0, &(far.0 - near.0).normalize(), &near.1);
-        profile.build(&prev_cut, &cut, &mut verts, &mut idxs, &mut uvs);
     }
 
     Mesh::new(

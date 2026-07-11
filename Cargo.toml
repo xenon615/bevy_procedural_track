@@ -32,18 +32,27 @@ version = "0.19.*"
 default-features = false
 features = ["3d"]
 
+
+# 3 closed tracks different profiles
 [[example]]
 name = "basic"
-# path = "../examples/basic.rs"
 
+# one closed track with textture applied
 [[example]]
 name = "textured"
-# path = "examples/textured.rs"
 
+# custom silly triangle profile
 [[example]]
 name = "custom_profile"
-# path = "../examples/custom_profile.rs"
 
+# collider applied
 [[example]]
 name = "with_collider"
-# path = "physics/src/main.rs"
+
+# contact  track with cuboid
+[[example]]
+name = "contact"
+
+# contact  track to track
+[[example]]
+name = "contact2"

@@ -75,7 +75,7 @@ fn create_track(
     // The accuracy of the binormals may be questionable, but at least it works.
 
     // let's create a closed flat route with a half-width of 4
-    let mesh = track_mesh(&points, EpFlat{half_width: 4.}, true);
+    let mesh = track_mesh(&points, EpFlat{half_width: 4.}, None, None);
 
     let mesh = meshes.add(mesh);
     cmd.spawn((
@@ -95,7 +95,7 @@ fn create_track(
         .map(| ( p, v ) | ( p, v.normalize().cross(Vec3::Y).normalize() ))
         .collect::<Vec<_>>()
     ;
-    let mesh = track_mesh(&points, EpBox{half_width: 4., half_height: 0.5}, true);
+    let mesh = track_mesh(&points, EpBox{half_width: 4., half_height: 0.5}, None, None);
     let mesh = meshes.add(mesh);
     cmd.spawn((
         Transform::from_translation(Vec3::ZERO.with_y(10.)),
@@ -115,7 +115,15 @@ fn create_track(
         .map(| ( p, v ) | ( p, v.normalize().cross(Vec3::Y).normalize() ))
         .collect::<Vec<_>>()
     ;
-    let mesh = track_mesh(&points, EpSquareChannel{half_width: 4.,  height: 2., depth: 1.8, border_width: 0.5}, true);
+
+    // let marker_point = points[0].0 + Vec3:: Y * 20.;
+    // cmd.spawn((
+    //     Transform::from_translation(marker_point),
+    //     Mesh3d(meshes.add(Sphere::new(2.0))),
+    //     MeshMaterial3d(materials.add(Color::BLACK))
+    // ));
+
+    let mesh = track_mesh(&points, EpSquareChannel{half_width: 4.,  height: 2., depth: 1.8, border_width: 0.5},  None, None);
     let mesh = meshes.add(mesh);
     cmd.spawn((
         Transform::from_translation(Vec3::ZERO.with_y(20.)),

@@ -73,7 +73,7 @@ fn create_track(
         .collect::<Vec<_>>()
     ;
 
-    let mesh = track_mesh(&points, EpSquareChannel{half_width: 1., height: 0.5, depth: 0.35, border_width: 0.2}, true);
+    let mesh = track_mesh(&points, EpSquareChannel{half_width: 1., height: 0.5, depth: 0.35, border_width: 0.2}, None, None);
 
 
     //You may want to use your own UV according to your texture.

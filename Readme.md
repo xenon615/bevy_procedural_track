@@ -19,11 +19,19 @@ I had to do it myself, but I did it as best I could. Feel free to use it if you 
  
  And of course, we can apply collider
 
- ![with_collider](img/img4.png)  
+ ![with_collider](img/img4.png)
+
+ Besides this we can join track to the figure, say cuboid 
+ 
+![join to cuboid](img/img5.png)
+ 
+ or join one track to another
+
+ ![track to track](img/img6.png)
  
 
 ## How to use it
-please refer to ([basic example](/examples/basic.rs))
+please refer to ([examples](/examples))
 
 ### Need a source of points 
 (Vector of Vec3)

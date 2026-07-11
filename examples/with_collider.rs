@@ -62,7 +62,7 @@ fn startup(
         .collect::<Vec<_>>()
     ;
 
-    let mesh = track_mesh(&points, EpSquareChannel{half_width: 2., height: 1., depth: 0.5, border_width: 0.2}, false);
+    let mesh = track_mesh(&points, EpSquareChannel{half_width: 2., height: 1., depth: 0.5, border_width: 0.2}, None, None);
 
     cmd.spawn_scene(bsn!{
         Mesh3d(asset_value(mesh))

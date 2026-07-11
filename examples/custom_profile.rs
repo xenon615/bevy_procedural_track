@@ -100,7 +100,7 @@ fn create_track(
         .collect::<Vec<_>>()
     ;
 
-    let mesh = track_mesh(&points, EpTriangularDitch{half_width: 0.2, height: 0.1}, false);
+    let mesh = track_mesh(&points, EpTriangularDitch{half_width: 0.2, height: 0.1}, None, None);
     let mesh = meshes.add(mesh);
 
     let mesh_mat = materials.add(StandardMaterial {
