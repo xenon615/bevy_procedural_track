@@ -1,5 +1,5 @@
 
-// how to contact track to track
+// how to connect track to track
 
 use bevy::{
     camera_controller::free_camera::{FreeCamera, FreeCameraPlugin},

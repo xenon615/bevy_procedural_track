@@ -49,10 +49,10 @@ name = "custom_profile"
 [[example]]
 name = "with_collider"
 
-# contact  track with cuboid
+# connect  track with cuboid
 [[example]]
-name = "contact"
+name = "connect"
 
-# contact  track to track
+# connect  track to track
 [[example]]
-name = "contact2"
+name = "connect2"
